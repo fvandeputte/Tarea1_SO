@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "program.c"
 int main( int argc, char * argv [] ) {
     printf("Cantidad de argumentos: %i\n", argc);
     /*Aqui leemos y clasificamos el inpit */
@@ -15,6 +16,8 @@ int main( int argc, char * argv [] ) {
         int s = argv[5];
         char *v1 = 'v1';
     }
+    input_read(path);
+
 
 
 
