@@ -1,30 +1,72 @@
 #include "program.h"
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 /* Aqui haremos el init de process */
-Process * process_init(int pid, char nombre[256]){
+/*Process * process_init(int pid, char nombre[256]){
     Process *pointer;
     pointer = malloc(sizeof(Process));
     pointer -> pid = pid;
     strncpy(pointer -> nombre, nombre, 256);
     printf("Creando proceso de nombre: %s ", pointer -> nombre);
     printf("y pid: %i \n", pointer -> pid);
+}*/
+
+Process* process_init(int pid, char * name, int  start_time, int count, int * lista){
+    Process * pointer;
+    pointer = malloc(sizeof(Process));
+    pointer -> pid = pid;
+    pointer -> name = name;
+    pointer -> start_time = start_time;
+    printf("start_time: %i \n", start_time);
+    pointer -> count = count;
+    pointer -> array = lista;
+    printf("Create Process called: %s, with pid: %i, it has to start at: %i and have %i elements\n",
+     pointer -> name, pointer -> pid, pointer -> start_time, pointer -> count);
 }
+    
 
 
-
-
-/* Aqui leemos el los programas de inputs */
+/* Aqui leemos el los programas de inputs, la funcion strtol usada para pasarlo a entero*/
 void input_read(char *path){
     FILE *fp1;
     char buff[255];
     fp1= fopen (path, "r");
+    char * name;
     char * pch;
+    long start_time;
+    long n;
+    char *ptr;
     int pid = 1;
+    int * lista_enteros[8];
     while (fgets(buff, 255, (FILE*)fp1) != NULL){
+        int contador= 0;
         printf("%s\n", buff );
-        pch = strtok (buff," ");
-        process_init(pid, pch);
-        pid += 1;
+        name = strtok(buff," ");
+        pch = strtok (NULL, " ");
+          while (pch != NULL)
+              { 
+                if (contador == 0){
+                    start_time = strtol(pch, &ptr, 10);
+                  
+                   
+                }
+                else if (contador == 1){
+                    n = strtol(pch, &ptr, 10);
+                    
+                    
+                   
+                }
+                else { 
+                    if (pch != NULL){
+                    lista_enteros[contador - 2] = pch;
+                    }
+                }
+                contador += 1;
+                pch = strtok (NULL, " ");
+              }
+        pid += 1; 
+        process_init(pid, name, start_time, n, lista_enteros);  
     }
 
 }
