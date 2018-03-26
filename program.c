@@ -18,7 +18,6 @@ Process* process_init(int pid, char * name, int  start_time, int count, int * li
     pointer -> pid = pid;
     pointer -> name = name;
     pointer -> start_time = start_time;
-    printf("start_time: %i \n", start_time);
     pointer -> count = count;
     pointer -> array = lista;
     printf("Create Process called: %s, with pid: %i, it has to start at: %i and have %i elements\n",
@@ -29,16 +28,20 @@ Process* process_init(int pid, char * name, int  start_time, int count, int * li
 
 /* Aqui leemos el los programas de inputs, la funcion strtol usada para pasarlo a entero*/
 void input_read(char *path){
+    /* Estas 3 lineas se usan para leer el archivo */
     FILE *fp1;
-    char buff[255];
+    char buff[255];             /* En buff almacenaremos la linea */
     fp1= fopen (path, "r");
+    /* Fin de las 3 lineas */ 
     char * name;
     char * pch;
     long start_time;
     long n;
     char *ptr;
     int pid = 1;
+    /* Aqui falta arreglar para el verdadero porte, de alguna manera linkearlo con el n*/
     int * lista_enteros[8];
+    /* Fin de lo que hay que arreglar */
     while (fgets(buff, 255, (FILE*)fp1) != NULL){
         int contador= 0;
         printf("%s\n", buff );
@@ -47,15 +50,10 @@ void input_read(char *path){
           while (pch != NULL)
               { 
                 if (contador == 0){
-                    start_time = strtol(pch, &ptr, 10);
-                  
-                   
+                    start_time = strtol(pch, &ptr, 10);       
                 }
                 else if (contador == 1){
                     n = strtol(pch, &ptr, 10);
-                    
-                    
-                   
                 }
                 else { 
                     if (pch != NULL){

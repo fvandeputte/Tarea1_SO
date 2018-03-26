@@ -3,7 +3,7 @@ struct process {
     int pid;
     char * name;
     long start_time;
-    long count;
+    longs count;
     int *array;
     /*estados ru, re, fi */
     char estado[2];
