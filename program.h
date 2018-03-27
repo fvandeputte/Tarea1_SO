@@ -1,7 +1,7 @@
 /* Definimos la estructuras process */
 struct process {
     int pid;
-    char * name;
+    char name[255];
     long start_time;
     long count;
     int *array;

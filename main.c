@@ -20,7 +20,8 @@ int main( int argc, char * argv [] ) {
     bodega = input_read(path);
     /*iniciar simulacion */
     int t=0;
-    for (t; t < 40; t++){
+
+    for (t; t < 40; t++){   /* Aqui falta ponerle una condicion de término */
         revisar_llegadas(bodega, t);
     }
 

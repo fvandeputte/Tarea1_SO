@@ -10,14 +10,12 @@ Process* process_init(int pid, char * name, int  start_time, int count, int * li
     Process * pointer;
     pointer = malloc(sizeof(Process));
     pointer -> pid = pid;
-    pointer -> name = name;
-    printf("Name: %s\n",name );
+    strcpy(pointer -> name,name);
     pointer -> start_time = start_time;
     pointer -> count = count;
     pointer -> array = lista;
     printf("Create Process called: %s, with pid: %i, it has to start at: %i and have %i elements\n",
     pointer -> name, pointer -> pid, pointer -> start_time, pointer -> count);
-    printf("Name_2: %s\n",pointer -> name );
     linkedlist_append(pointer_lista, pointer);
 }
 
@@ -82,7 +80,6 @@ void revisar_llegadas(LinkedList * puntero_bodega, int t)
     Process *puntero_actual;
     Process *puntero_siguiente;
     puntero_actual = puntero_bodega -> puntero_inicio;
-    printf("Primer start_time: %i \n", puntero_actual -> start_time);
     for (k = 0; k < puntero_bodega -> count; k++){
         puntero_siguiente = puntero_actual -> siguiente;
         if (puntero_actual -> start_time == t){
@@ -119,6 +116,6 @@ void linkedlist_append(LinkedList* list, Process* process_pointer)
         list -> puntero_final = process_pointer;
         list -> count += 1;
     }
-    printf("Name_3.1: %s\n", list -> puntero_final -> name);
+   
 
 }
