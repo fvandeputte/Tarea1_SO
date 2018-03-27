@@ -12,12 +12,18 @@ int main( int argc, char * argv [] ) {
     /*queues */
     int queues = atoi(argv[4]);
     /* manejar el error en caso de que estemos en v1 y haya <S> */
-
     if (argc > 5){
         int s = argv[5];
         char *v1 = 'v1';
     }
-    input_read(path);
+    LinkedList * bodega;
+    bodega = input_read(path);
+    /*iniciar simulacion */
+    int t=0;
+    for (t; t < 40; t++){
+        revisar_llegadas(bodega, t);
+    }
+
 
 
 

@@ -31,12 +31,20 @@ struct queue
     
 };
 
-LinkedList* linkedlist_init();
+
 
 /*declaramos funcion para leer*/
-void input_read(char path[]);
+LinkedList * input_read(char path[]);
 
-/*declaramos funcion para iniciar y retornar su puntero */
+/*revisar llegadas */
+void revisar_llegadas(LinkedList * puntero_bodega, int t);
+
+/*Funciones de process */
 Process* process_init(int pid, char * name, int  start_time, int  count, int * lista, LinkedList * pointer_lista);
+/* Fin funciones de process
 
+/* Funciones de Linked List */
+LinkedList* linkedlist_init();
 void linkedlist_append(LinkedList* list, Process* process);
+/* Fin funciones de linked list */
+
