@@ -17,6 +17,9 @@ int main( int argc, char * argv [] ) {
         char *v1 = 'v1';
     }
     LinkedList * bodega;
+    LinkedList QueueArray[queues];
+
+
     bodega = input_read(path);
     /*iniciar simulacion */
     int t=0;

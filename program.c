@@ -35,7 +35,7 @@ LinkedList * input_read(char *path){
     LinkedList *puntero_bodega;
     puntero_bodega = linkedlist_init();
     /* Aqui falta arreglar para el verdadero porte, de alguna manera linkearlo con el n*/
-    int * lista_enteros[8];
+    int lista_enteros[8];
     /* Fin de lo que hay que arreglar */
     while (fgets(buff, 255, (FILE*)fp1) != NULL){
         contador_procesos += 1;
@@ -53,7 +53,7 @@ LinkedList * input_read(char *path){
                 }
                 else { 
                     if (pch != NULL){
-                    lista_enteros[contador - 2] = pch;
+	                    lista_enteros[contador - 2] = atoi(pch);
                     }
                 }
                 contador += 1;
