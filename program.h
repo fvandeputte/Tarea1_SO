@@ -56,5 +56,6 @@ Process* process_init(int pid, char * name, int  start_time, int  count, int * l
 /* Funciones de Linked List */
 LinkedList* linkedlist_init();
 void linkedlist_append(LinkedList* list, Process* process);
+void linkedlist_remove(LinkedList* list, Process* process);
 /* Fin funciones de linked list */
 

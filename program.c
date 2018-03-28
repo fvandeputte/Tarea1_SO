@@ -118,4 +118,19 @@ void linkedlist_append(LinkedList* list, Process* process_pointer)
         list -> count += 1;
     }
 }
+
+void linkedlist_remove(LinkedList* list, Process* process) {
+	Process* cur = list -> puntero_inicio;
+	if (cur == process) {
+		list -> puntero_inicio = process -> siguiente;
+	} else {
+		Process* prev;
+		while (cur != process) {
+			prev = cur;
+			cur -> cur -> siguiente;
+		}
+		prev -> siguiente = cur -> siguiente;
+	}
+}
+
 /* Termino funciones de linked list */

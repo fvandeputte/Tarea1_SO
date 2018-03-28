@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include "program.c"
 
-void spend_quantum(Process* cur) {
+void spend_quantum(Process* cur, LinkedList* queue) {
     if (cur -> cur_quantum > cur -> cur_burst_value) { /*Si no te vas a gastar todo el quantum que te queda...*/
         cur -> cur_quantum -= cur -> cur_burst_value;
         cur->cur_burst_idx ++;
         if (cur -> count > cur -> cur_burst_idx) { /*Hay más bursts*/
             cur -> cur_burst_value = cur -> array[cur->cur_burst_idx];
         } else { /*No hay más bursts*/
-            // terminar_proceso();
+            printf("Se terminó proceso de pid %d y nombre %s\n", cur -> pid, cur -> name);
+            linkedlist_remove(queue, cur);
         }
     } else {
         cur -> cur_burst_value -= cur -> cur_quantum;
