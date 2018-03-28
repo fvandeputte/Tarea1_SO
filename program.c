@@ -3,9 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* Aqui haremos el init de process */
-
-
+/* Inicializar procesos, desde la lectura */
 Process* process_init(int pid, char * name, int  start_time, int count, int * lista, LinkedList * pointer_lista){
     Process * pointer;
     pointer = malloc(sizeof(Process));
@@ -18,17 +16,13 @@ Process* process_init(int pid, char * name, int  start_time, int count, int * li
     pointer -> name, pointer -> pid, pointer -> start_time, pointer -> count);
     linkedlist_append(pointer_lista, pointer);
 }
-
-
-
-
-
+/* Termino inicio de procesos
 
 /* Aqui leemos el los programas de inputs, la funcion strtol usada para pasarlo a entero*/
 LinkedList * input_read(char *path){
     /* Estas 3 lineas se usan para leer el archivo */
     FILE *fp1;
-    char buff[255];             /* En buff almacenaremos la linea */
+    char buff[255];                         /* En buff almacenaremos la linea */
     fp1= fopen (path, "r");
     /* Fin de las 3 lineas */ 
     char * name;
@@ -70,10 +64,10 @@ LinkedList * input_read(char *path){
 
     }
     return puntero_bodega;
-
 }
+/* Fin lectura archivo */
 
-/*revisar llegadas */
+/*Funcion que revisa llegadas */
 void revisar_llegadas(LinkedList * puntero_bodega, int t)
 {
     int k;
@@ -88,10 +82,11 @@ void revisar_llegadas(LinkedList * puntero_bodega, int t)
         puntero_actual = puntero_siguiente;
     }
 }
+/*Fin revisar llegadas */
 
 
+/*Funciones de linked list */
 LinkedList* linkedlist_init()
-
 {
     LinkedList *puntero_ll;
     puntero_ll = malloc(sizeof(LinkedList));
@@ -116,6 +111,5 @@ void linkedlist_append(LinkedList* list, Process* process_pointer)
         list -> puntero_final = process_pointer;
         list -> count += 1;
     }
-   
-
 }
+/* Termino funciones de linked list */

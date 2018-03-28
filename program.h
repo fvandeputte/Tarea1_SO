@@ -5,14 +5,15 @@ struct process {
     long start_time;
     long count;
     int *array;
-    
-    struct process * siguiente; /*Usado para bodega inicial*/
-    /*estados ru, re, fi */
-    char estado[2];
+    struct process * siguiente;         /*Usado para bodega inicial*/
+    char estado[2];                     /*estados ru, re, fi */
 
 };
 typedef struct process Process;
+/* Fin estructura de procesos */
 
+
+/* estructura lista ligada */
 struct linked_list
 {
   Process *puntero_inicio;
@@ -20,28 +21,34 @@ struct linked_list
   int count;
 };
 typedef struct linked_list LinkedList;
+/* Fin estructura de lista_ligada */
 
 
-
-
+/*Estructura cola */
 struct queue
 {
     /* le definimos una lista de punteros de procesos, inicialemtente de tamaño 8 */
     /*Process** process_list = malloc(8*sizeof(Process *));*/
     
 };
+/*Fin de estructura queue */
 
 
 
-/*declaramos funcion para leer*/
-LinkedList * input_read(char path[]);
+LinkedList * input_read(char path[]);                           /*declaramos funcion para leer*/
 
-/*revisar llegadas */
-void revisar_llegadas(LinkedList * puntero_bodega, int t);
+
+void revisar_llegadas(LinkedList * puntero_bodega, int t);      /*revisar llegadas */
+
+
+
 
 /*Funciones de process */
 Process* process_init(int pid, char * name, int  start_time, int  count, int * lista, LinkedList * pointer_lista);
 /* Fin funciones de process
+
+
+
 
 /* Funciones de Linked List */
 LinkedList* linkedlist_init();
