@@ -1,5 +1,40 @@
 #include <stdio.h>
 #include "program.c"
+
+void spend_quantum(Process* cur) {
+    if (cur -> cur_quantum > cur -> cur_burst_value) { /*Si no te vas a gastar todo el quantum que te queda...*/
+        cur -> cur_quantum -= cur -> cur_burst_value;
+        cur->cur_burst_idx ++;
+        if (cur -> count > cur -> cur_burst_idx) { /*Hay más bursts*/
+            cur -> cur_burst_value = cur -> array[cur->cur_burst_idx];
+        } else { /*No hay más bursts*/
+            // terminar_proceso();
+        }
+    } else {
+        cur -> cur_burst_value -= cur -> cur_quantum;
+        cur -> cur_quantum = 0;
+        // bajar_prioridad();
+    }
+}
+
+
+void round_robin(LinkedList* queue, int quantum) {
+    while (queue -> puntero_inicio != NULL) {
+        Process* cur = queue -> puntero_inicio;
+        if (cur -> cur_quantum == -1) { /*lo estoy seteando acá, parte siendo -1*/
+            cur -> cur_quantum = quantum;
+        }
+        spend_quantum(cur);
+        if (cur == queue -> puntero_final) { /*Si estamos al final, volver al principio*/
+            cur = queue -> puntero_inicio;
+        } else { /*avanzar al siguiente en otro caso*/
+            cur = cur -> siguiente;
+        }
+    }
+}
+
+
+
 int main( int argc, char * argv [] ) {
     printf("Cantidad de argumentos: %i\n", argc);
     /*Aqui leemos y clasificamos el inpit */

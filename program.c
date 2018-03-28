@@ -4,16 +4,22 @@
 #include <stdlib.h>
 
 /* Inicializar procesos, desde la lectura */
-Process* process_init(int pid, char * name, int  start_time, int count, int * lista, LinkedList * pointer_lista){
+Process* process_init(int pid, char * name, int start_time, int count, int* lista, LinkedList * pointer_lista){
     Process * pointer;
     pointer = malloc(sizeof(Process));
     pointer -> pid = pid;
     strcpy(pointer -> name,name);
     pointer -> start_time = start_time;
+    pointer -> cur_quantum = -1;
     pointer -> count = count;
     pointer -> array = lista;
-    printf("Create Process called: %s, with pid: %i, it has to start at: %i and have %i elements\n",
+    printf("Create Process object called: %s, with pid: %i, it has to start at: %i and have %i elements\n",
     pointer -> name, pointer -> pid, pointer -> start_time, pointer -> count);
+    printf("Arreglo lista es ");
+    for(int j = 0; j < count; j++) {
+        printf("%d ", pointer -> array[j]);
+    }
+    printf("\n");
     linkedlist_append(pointer_lista, pointer);
 }
 /* Termino inicio de procesos

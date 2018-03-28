@@ -5,6 +5,9 @@ struct process {
     long start_time;
     long count;
     int *array;
+    int cur_burst_idx;					/*Índice de burst que toca*/
+    int cur_burst_value;				/*Pero si ya lleva un poco de la burst actual, aquí decimos cuánto queda*/
+    int cur_quantum;
     struct process * siguiente;         /*Usado para bodega inicial*/
     char estado[2];                     /*estados ru, re, fi */
 
