@@ -15,11 +15,11 @@ Process* process_init(int pid, char * name, int start_time, int count, int* list
     pointer -> array = lista;
     printf("Create Process object called: %s, with pid: %i, it has to start at: %i and have %i elements\n",
     pointer -> name, pointer -> pid, pointer -> start_time, pointer -> count);
-    printf("Arreglo lista es ");
-    for(int j = 0; j < count; j++) {
-        printf("%d ", pointer -> array[j]);
-    }
-    printf("\n");
+    // printf("Arreglo lista es ");
+    // for(int j = 0; j < count; j++) {
+    //     printf("%d ", pointer -> array[j]);
+    // }
+    // printf("\n");
     linkedlist_append(pointer_lista, pointer);
 }
 /* Termino inicio de procesos
@@ -72,6 +72,42 @@ LinkedList * input_read(char *path){
     return puntero_bodega;
 }
 /* Fin lectura archivo */
+
+
+void spend_quantum(Process* cur, LinkedList* queue) {
+    if (cur -> cur_quantum > cur -> cur_burst_value) { /*Si no te vas a gastar todo el quantum que te queda...*/
+        cur -> cur_quantum -= cur -> cur_burst_value;
+        cur->cur_burst_idx++;
+        if (cur -> count > cur -> cur_burst_idx) { /*Hay más bursts*/
+            cur -> cur_burst_value = cur -> array[cur->cur_burst_idx];
+        } else { /*No hay más bursts*/
+            printf("Se terminó proceso de pid %d y nombre %s\n", cur -> pid, cur -> name);
+            linkedlist_remove(queue, cur);
+        }
+    } else {
+        cur -> cur_burst_value -= cur -> cur_quantum;
+        cur -> cur_quantum = 0;
+        // bajar_prioridad();
+    }
+}
+
+
+void round_robin(LinkedList* queue, int quantum) {
+    while (queue -> puntero_inicio != NULL) {
+        Process* cur = queue -> puntero_inicio;
+        if (cur -> cur_quantum == -1) { /*lo estoy seteando acá, parte siendo -1*/
+            cur -> cur_quantum = quantum;
+        }
+        spend_quantum(cur, queue);
+        if (cur == queue -> puntero_final) { /*Si estamos al final, volver al principio*/
+            cur = queue -> puntero_inicio;
+        } else { /*avanzar al siguiente en otro caso*/
+            cur = cur -> siguiente;
+        }
+    }
+}
+
+
 
 /*Funcion que revisa llegadas */
 void revisar_llegadas(LinkedList * puntero_bodega, int t)
@@ -127,7 +163,7 @@ void linkedlist_remove(LinkedList* list, Process* process) {
 		Process* prev;
 		while (cur != process) {
 			prev = cur;
-			cur -> cur -> siguiente;
+			cur -> siguiente;
 		}
 		prev -> siguiente = cur -> siguiente;
 	}
