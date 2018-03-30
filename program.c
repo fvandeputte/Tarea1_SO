@@ -13,6 +13,8 @@ Process* process_init(int pid, char * name, int start_time, int count, int* list
     pointer -> cur_quantum = -1;
     pointer -> count = count;
     pointer -> array = lista;
+    pointer -> cur_burst_value = pointer -> array [0];
+    pointer -> cur_burst_idx = 0;
     printf("Create Process object called: %s, with pid: %i, it has to start at: %i and have %i elements\n",
     pointer -> name, pointer -> pid, pointer -> start_time, pointer -> count);
     // printf("Arreglo lista es ");
@@ -27,8 +29,9 @@ Process* process_init(int pid, char * name, int start_time, int count, int* list
 
 LinkedList* create_queue() {
 	LinkedList* queue;
-	queue -> puntero_inicio = NULL;
-	queue -> puntero_final = NULL;
+	Process* aux;
+	queue -> puntero_inicio = aux;
+	queue -> puntero_final = aux;
 	queue -> count = 0;
 	return queue;
 }
@@ -98,6 +101,7 @@ void bajar_prioridad(Process* cur, LinkedList* queue, LinkedList* QueueArray[]) 
 
 
 void spend_quantum(Process* cur, LinkedList* queue, LinkedList* QueueArray[]) {
+	printf("Aquí en %s, con burst de %d y quantum de %d\n", cur -> name, cur -> cur_burst_value, cur -> cur_quantum);
     if (cur -> cur_quantum > cur -> cur_burst_value) { /*Si no te vas a gastar todo el quantum que te queda...*/
         cur -> cur_quantum -= cur -> cur_burst_value;
         cur->cur_burst_idx++;
@@ -108,8 +112,10 @@ void spend_quantum(Process* cur, LinkedList* queue, LinkedList* QueueArray[]) {
             linkedlist_remove(queue, cur, 1);
         }
     } else {
+    	printf("quantum <= burst: ");
         cur -> cur_burst_value -= cur -> cur_quantum;
         cur -> cur_quantum = 0;
+        printf("Ahora %s, con burst de %d y quantum de %d\n", cur -> name, cur -> cur_burst_value, cur -> cur_quantum);
         cur -> interrups++;
         bajar_prioridad(cur, queue, QueueArray);
     }
@@ -117,20 +123,17 @@ void spend_quantum(Process* cur, LinkedList* queue, LinkedList* QueueArray[]) {
 
 
 void round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[]) {
-	printf("En round_robin 0\n");
 	Process* cur;
-	// printf("%s\n", queue);
-	printf("En round_robin 1\n");
-	printf("%s\n", queue -> puntero_inicio);
-	printf("En round_robin 2\n");
-    while (queue -> puntero_inicio != NULL) {
+    while (queue -> count > 0) {
         cur = queue -> puntero_inicio;
         strcpy(cur -> estado, "ru");
         cur -> elegido_cpu++;
         if (cur -> cur_quantum == -1) { /*lo estoy seteando acá, parte siendo -1*/
             cur -> cur_quantum = quantum;
         }
+        printf("Previo a CPU %s: %d\n", cur -> name, cur -> cur_quantum);
         spend_quantum(cur, queue, QueueArray);
+        printf("Posterior a CPU %s: %d\n", cur -> name, cur -> cur_quantum);
         strcpy(cur -> estado, "re");
         if (cur == queue -> puntero_final) { /*Si estamos al final, volver al principio*/
             cur = queue -> puntero_inicio;
@@ -145,29 +148,21 @@ void round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[]) {
 /*Funcion que revisa llegadas */
 void revisar_llegadas(LinkedList * puntero_bodega, int t, int queues, LinkedList* QueueArray[queues], int quantum)
 { /*Último parámetro es solamente el largo de QueueArray*/
-	// printf("ACA0\n");
     int k;
     Process *puntero_actual;
     Process *puntero_siguiente;
     puntero_actual = puntero_bodega -> puntero_inicio;
     for (k = 0; k < puntero_bodega -> count; k++){
-    	// printf("ACA1 %d %d\n", k, puntero_bodega -> count);
-    	// printf("puntero_actual %s %s\n", puntero_actual -> name, puntero_actual -> siguiente);
-    	// printf("puntero_siguiente %s\n", puntero_actual -> siguiente_q -> name);
         puntero_siguiente = puntero_actual -> siguiente;
-        // printf("ACA1 post\n");
         if (puntero_actual -> start_time == t){
             printf("Process with name %s, start at %i\n",puntero_actual -> name, puntero_actual -> start_time);
             linkedlist_append(QueueArray[0], puntero_actual, 1); 
         }
-        // printf("ACA pre\n");
         puntero_actual = puntero_siguiente;
-        // printf("ACA post\n");
     }
     for (int i=0; i < queues; i++) {
-    	// printf("ACA2\n");
+    	printf("ACA, llamando a round_robin en queue %d, que tiene %d elemento(s)\n", i, QueueArray[i] -> count);
     	round_robin(QueueArray[i], quantum, QueueArray);
-    	// printf("ACA3\n");
     }
 }
 /*Fin revisar llegadas */

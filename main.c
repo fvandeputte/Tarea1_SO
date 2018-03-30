@@ -12,7 +12,7 @@ int main( int argc, char * argv [] ) {
     /* path */
     char *path = argv[2];
     /* quantum */
-    int quantum = argv[3];
+    int quantum = atoi(argv[3]);
     /*queues */
     int queues = atoi(argv[4]);
     /* manejar el error en caso de que estemos en v1 y haya <S> */
@@ -28,11 +28,11 @@ int main( int argc, char * argv [] ) {
     }
     LinkedList * bodega;
     LinkedList* QueueArray[queues];
-    /*Crear cada queue con puntero_inicial = NULL*/
+    /*Crear cada queue con puntero_inicio = NULL*/
     for (int i=0; i < queues; i++) {
         QueueArray[i] = create_queue();
     }
-    // printf("%d\n", QueueArray[1] -> count);
+    // printf("%s\n", QueueArray[1] -> puntero_inicio);
 
 
     bodega = input_read(path);
