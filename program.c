@@ -17,11 +17,11 @@ Process* process_init(int pid, char * name, int start_time, int count, int* list
     pointer -> cur_burst_idx = 0;
     printf("Create Process object called: %s, with pid: %i, it has to start at: %i and have %i elements\n",
     pointer -> name, pointer -> pid, pointer -> start_time, pointer -> count);
-    // printf("Arreglo lista es ");
-    // for(int j = 0; j < count; j++) {
-    //     printf("%d ", pointer -> array[j]);
-    // }
-    // printf("\n");
+    printf("Arreglo lista es ");
+    for(int j = 0; j < count; j++) {
+        printf("%d ", pointer -> array[j]);
+    }
+    printf("\n");
     linkedlist_append(pointer_lista, pointer, 0);
 }
 /* Termino inicio de procesos*/
@@ -91,10 +91,10 @@ void bajar_prioridad(Process* cur, LinkedList* queue, LinkedList* QueueArray[]) 
 	LinkedList* queue_check = QueueArray[0];
 	int y = 0;
 	while (queue_check != queue) {
-		queue_check = QueueArray[++y];
+		queue_check = QueueArray[y++];
 	}
-	linkedlist_remove(cur, queue, 1);
-	linkedlist_append(cur, QueueArray[y+1], 1);
+	linkedlist_remove(queue, cur, 1);
+	linkedlist_append(QueueArray[y+1], cur, 1);
 	cur -> cur_quantum = -1; /*round robin se encarga de ponerle el correcto*/
 	printf("Movimos de queue n° %d a %d\n", y, y+1);
 }
@@ -107,6 +107,13 @@ void spend_quantum(Process* cur, LinkedList* queue, LinkedList* QueueArray[]) {
         cur->cur_burst_idx++;
         if (cur -> count > cur -> cur_burst_idx) { /*Hay más bursts*/
             cur -> cur_burst_value = cur -> array[cur->cur_burst_idx];
+            printf("Pasamos a siguiente burst, es de %d\n", cur -> cur_burst_value);
+            printf("Índice %d\n", cur -> cur_burst_idx);
+      //       printf("Arreglo lista es ");
+		    // for(int j = 0; j < cur -> count; j++) {
+		    //     printf("%d ", cur -> array[j]);
+		    // }
+		    // printf("\n");
         } else { /*No hay más bursts*/
             printf("Se terminó proceso de pid %d y nombre %s\n", cur -> pid, cur -> name);
             linkedlist_remove(queue, cur, 1);
@@ -132,7 +139,15 @@ void round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[]) {
             cur -> cur_quantum = quantum;
         }
         printf("Previo a CPU %s: %d\n", cur -> name, cur -> cur_quantum);
+        printf("Arreglo lista es ");
+	    for(int j = 0; j < cur -> count; j++) {
+	        printf("%d ", cur -> array[j]);
+	    }
+	    printf("\n");
         spend_quantum(cur, queue, QueueArray);
+        if (cur -> cur_quantum == -1) { 
+            cur -> cur_quantum = quantum;
+        }
         printf("Posterior a CPU %s: %d\n", cur -> name, cur -> cur_quantum);
         strcpy(cur -> estado, "re");
         if (cur == queue -> puntero_final) { /*Si estamos al final, volver al principio*/
@@ -156,6 +171,12 @@ void revisar_llegadas(LinkedList * puntero_bodega, int t, int queues, LinkedList
         puntero_siguiente = puntero_actual -> siguiente;
         if (puntero_actual -> start_time == t){
             printf("Process with name %s, start at %i\n",puntero_actual -> name, puntero_actual -> start_time);
+            printf("Arreglo lista es ");
+		    for(int j = 0; j < puntero_actual -> count; j++) {
+		        printf("%d ", puntero_actual -> array[j]);
+		    }
+		    printf("\n");
+		    exit(0);
             linkedlist_append(QueueArray[0], puntero_actual, 1); 
         }
         puntero_actual = puntero_siguiente;
@@ -197,6 +218,7 @@ void linkedlist_append(LinkedList* list, Process* process_pointer, int Q)
 	} else if (Q == 1) { /*queue, se ocupa process -> siguiente_q*/
 	    if (list-> count == 0)
 	    {
+	    	// printf("Deberíamos estar acá\n");
 	        list -> puntero_inicio = process_pointer;
 	        list -> puntero_final = process_pointer;
 	        list -> count += 1;
@@ -226,8 +248,14 @@ void linkedlist_remove(LinkedList* list, Process* process, int Q) { /*Q = 0 es a
 			prev -> siguiente = cur -> siguiente;
 		}
 	} else if (Q == 1) { /*queue, se ocupa process -> siguiente_q*/
+		// printf("cur: %s\n", cur -> name);
+		// printf("process: %d\n", process -> pid);
 		if (cur == process) {
+			// printf("Dentro if, encontramos a %s\n", cur -> name);
 			list -> puntero_inicio = process -> siguiente_q;
+			if (list -> count == 1) {
+				list -> puntero_final = list -> puntero_inicio;
+			}
 		} else {
 			Process* prev;
 			while (cur != process) {
@@ -237,7 +265,7 @@ void linkedlist_remove(LinkedList* list, Process* process, int Q) { /*Q = 0 es a
 			prev -> siguiente = cur -> siguiente_q;
 		}
 	}
-	
+	list -> count--;
 }
 
 /* Termino funciones de linked list */
