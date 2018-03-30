@@ -22,12 +22,17 @@ int main( int argc, char * argv [] ) {
             return 0;
         } else {
             int s = argv[5];
-            // hacer versión 3
+            // hacer versiones 2 y 3
         }
         
     }
     LinkedList * bodega;
-    LinkedList QueueArray[queues];
+    LinkedList* QueueArray[queues];
+    /*Crear cada queue con puntero_inicial = NULL*/
+    for (int i=0; i < queues; i++) {
+        QueueArray[i] = create_queue();
+    }
+    // printf("%d\n", QueueArray[1] -> count);
 
 
     bodega = input_read(path);
@@ -37,7 +42,8 @@ int main( int argc, char * argv [] ) {
         int t=0;
 
         for (t; t < 40; t++){   /* Aqui falta ponerle una condicion de término */
-            revisar_llegadas(bodega, t);
+            printf("Tiempo %d\n", t);
+            revisar_llegadas(bodega, t, queues, QueueArray, quantum);
         }
     }
     

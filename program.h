@@ -9,7 +9,13 @@ struct process {
     int cur_burst_value;				/*Pero si ya lleva un poco de la burst actual, aquí decimos cuánto queda*/
     int cur_quantum;
     struct process * siguiente;         /*Usado para bodega inicial*/
+    struct process * siguiente_q;         /*Usado para queue*/
     char estado[2];                     /*estados ru, re, fi */
+    int elegido_cpu;
+    int interrups;
+    int turnaround_t;
+    int response_t;
+    int waiting_t;
 
 };
 typedef struct process Process;
@@ -41,7 +47,7 @@ struct queue
 LinkedList * input_read(char path[]);                           /*declaramos funcion para leer*/
 
 
-void revisar_llegadas(LinkedList * puntero_bodega, int t);      /*revisar llegadas */
+void revisar_llegadas(LinkedList * puntero_bodega, int t, int queues, LinkedList* QueueArray[queues], int quantum);      /*revisar llegadas */
 
 
 
@@ -55,7 +61,7 @@ Process* process_init(int pid, char * name, int  start_time, int  count, int * l
 
 /* Funciones de Linked List */
 LinkedList* linkedlist_init();
-void linkedlist_append(LinkedList* list, Process* process);
-void linkedlist_remove(LinkedList* list, Process* process);
+void linkedlist_append(LinkedList* list, Process* process, int Q); /*Q = 0 es append en bodega, 1 en Queue*/
+void linkedlist_remove(LinkedList* list, Process* process, int Q); /*Q = 0 es append en bodega, 1 en Queue*/
 /* Fin funciones de linked list */
 
