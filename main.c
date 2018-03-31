@@ -21,7 +21,7 @@ int main( int argc, char * argv [] ) {
             printf("Error: estamos en v1, y se dio argumento S\n");
             return 0;
         } else {
-            int s = argv[5];
+            int s = atoi(argv[5]);
             // hacer versiones 2 y 3
         }
         
@@ -32,16 +32,13 @@ int main( int argc, char * argv [] ) {
     for (int i=0; i < queues; i++) {
         QueueArray[i] = create_queue();
     }
-    // printf("%s\n", QueueArray[1] -> puntero_inicio);
-
 
     bodega = input_read(path);
+    
     /*iniciar simulacion */
 
     if (strcmp(version, "v1") == 0) {
-        int t=0;
-
-        for (t; t < 40; t++){   /* Aqui falta ponerle una condicion de término */
+        for (int t=0; t < 40; t++){   /* Aqui falta ponerle una condicion de término */
             printf("Tiempo %d\n", t);
             revisar_llegadas(bodega, t, queues, QueueArray, quantum);
         }

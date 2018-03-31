@@ -9,7 +9,7 @@ struct process {
     int cur_burst_value;				/*Pero si ya lleva un poco de la burst actual, aquí decimos cuánto queda*/
     int cur_quantum;
     struct process * siguiente;         /*Usado para bodega inicial*/
-    struct process * siguiente_q;         /*Usado para queue*/
+    struct process * siguiente_q;       /*Usado para queue*/
     char estado[2];                     /*estados ru, re, fi */
     int elegido_cpu;
     int interrups;
