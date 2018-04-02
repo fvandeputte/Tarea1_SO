@@ -47,7 +47,7 @@ struct queue
 LinkedList * input_read(char path[]);                           /*declaramos funcion para leer*/
 
 
-void revisar_llegadas(LinkedList * puntero_bodega, int t, int queues, LinkedList* QueueArray[queues], int quantum);      /*revisar llegadas */
+Process* revisar_llegadas(LinkedList * puntero_bodega, int t, int queues, LinkedList* QueueArray[queues], int quantum, Process* in_cpu);      /*revisar llegadas */
 
 
 

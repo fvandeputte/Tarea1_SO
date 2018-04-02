@@ -1,3 +1,10 @@
 	-En una iteración del for ejecuto todo lo que tengo en las queues.
 	Tengo que ir haciéndolo con las iteraciones
 	Para eso hay que guardar (valor de retorno de revisar_llegadas?) quién está en la CPU, y round robin tiene que gestionar si queda quantum y burst, si mover de prioridad y todo eso. Lo más cómodo sería tener el proceso, como objeto, que está en la CPU, y en qué queue está (para no tener que ver una por una las queue hasta llegar a una que no está vacía)
+
+
+
+	revisar_llegadas te dice qué proceso está en la CPU (tiene que estar en 1ra queue no vacía). Vas a esa queue, y llamas a round_robin sobre esa queue. round_robin encuentra ese proceso, y ve si tiene que seguir (quantum > 0), o sacarlo y poner al siguiente.
+
+
+	Cuando no hay nadie y tiene que entrar un proceso: en qué caso estás?

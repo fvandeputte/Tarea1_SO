@@ -38,9 +38,15 @@ int main( int argc, char * argv [] ) {
     /*iniciar simulacion */
 
     if (strcmp(version, "v1") == 0) {
+        Process* in_cpu = (Process*) NULL; /*algún proceso basura para la primera iteración*/
         for (int t=0; t < 40; t++){   /* Aqui falta ponerle una condicion de término */
-            printf("Tiempo %d\n", t);
-            revisar_llegadas(bodega, t, queues, QueueArray, quantum);
+            in_cpu = revisar_llegadas(bodega, t, queues, QueueArray, quantum, in_cpu);
+            if (in_cpu == NULL) {
+                printf("Tiempo %d: proceso en CPU es NULL\n", t);
+            } else {
+                printf("Tiempo %d: proceso en CPU es %d\n", t, in_cpu -> pid);
+            }
+            
         }
     }
     

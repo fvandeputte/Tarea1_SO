@@ -82,7 +82,7 @@ LinkedList * input_read(char *path){
 }
 /* Fin lectura archivo */
 
-void bajar_prioridad(Process* cur, LinkedList* queue, LinkedList* QueueArray[]) {
+void bajar_prioridad(Process* cur, LinkedList* queue, LinkedList* QueueArray[], int quantum) {
 	int n = sizeof(QueueArray) / sizeof(QueueArray[0]);
 	LinkedList* queue_check = QueueArray[0];
 	int y = 0;
@@ -91,60 +91,92 @@ void bajar_prioridad(Process* cur, LinkedList* queue, LinkedList* QueueArray[]) 
 	}
 	linkedlist_remove(queue, cur, 1);
 	linkedlist_append(QueueArray[y+1], cur, 1);
-	cur -> cur_quantum = -1; /*round robin se encarga de ponerle el correcto*/
+	cur -> cur_quantum = quantum;
 	printf("Movimos de queue n° %d a %d\n", y, y+1);
 }
 
-
-void spend_quantum(Process* cur, LinkedList* queue, LinkedList* QueueArray[]) {
-	printf("Aquí en %s, con burst de %d y quantum de %d\n", cur -> name, cur -> cur_burst_value, cur -> cur_quantum);
-    if (cur -> cur_quantum > cur -> cur_burst_value) { /*Si no te vas a gastar todo el quantum que te queda...*/
-        cur -> cur_quantum -= cur -> cur_burst_value;
-        cur->cur_burst_idx++;
-        if (cur -> count > cur -> cur_burst_idx) { /*Hay más bursts*/
-            cur -> cur_burst_value = cur -> array[cur->cur_burst_idx];
-        } else { /*No hay más bursts*/
-            printf("Se terminó proceso de pid %d y nombre %s\n", cur -> pid, cur -> name);
-            linkedlist_remove(queue, cur, 1);
-        }
-    } else {
-    	printf("quantum <= burst: ");
-        cur -> cur_burst_value -= cur -> cur_quantum;
-        cur -> cur_quantum = 0;
-        printf("Ahora %s, con burst de %d y quantum de %d\n", cur -> name, cur -> cur_burst_value, cur -> cur_quantum);
-        cur -> interrups++;
-        bajar_prioridad(cur, queue, QueueArray);
-    }
-}
-
-
-void round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[]) {
+Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], Process* in_cpu) {
 	Process* cur = queue -> puntero_inicio;
-    while (queue -> count > 0) {
-        strcpy(cur -> estado, "ru");
-        cur -> elegido_cpu++;
-        if (cur -> cur_quantum == -1) { /*lo estoy seteando acá, parte siendo -1*/
-            cur -> cur_quantum = quantum;
+    if (cur -> cur_quantum == -1) {
+        cur -> cur_quantum = quantum;
+    }
+    /*Caso 0: no hay nadie en CPU y tiene que entrar alguien*/
+    if (in_cpu == NULL) {
+        if (queue -> count > 0) { /*No es necesario: revisar_llegada lo asegura así*/
+            printf("Caso 0\n");
+            return queue -> puntero_inicio;
         }
-        printf("Previo a CPU %s: %d\n", cur -> name, cur -> cur_quantum);
-        spend_quantum(cur, queue, QueueArray);
-        if (cur -> cur_quantum == -1) { 
-            cur -> cur_quantum = quantum;
+    }
+
+    while (cur != in_cpu) {
+        cur = cur -> siguiente_q;
+    }
+
+    printf("cur_quantum: %d; cur_burst_value: %d\n", cur -> cur_quantum, cur -> cur_burst_value);
+    /*1er caso: todavía queda quantum y queda algún burst, sigue el mismo en CPU ()*/
+    if (cur -> cur_quantum > 0 && (cur -> cur_burst_value > 0 || cur -> cur_burst_idx < cur -> count - 1)) {
+        printf("En caso 1\n");
+        cur -> cur_quantum--;
+        if (cur -> cur_burst_value > 0) {   /*En este burst*/
+            cur -> cur_burst_value--;
+        } else {
+            cur -> cur_burst_idx++;         /*Siguiente burst*/
+            cur -> cur_burst_value = cur -> array[cur -> cur_burst_idx];
         }
-        printf("Posterior a CPU %s: %d\n", cur -> name, cur -> cur_quantum);
+        //sumar a tiempo de procesamiento 1
+        return cur;
+    }
+
+    /*2do caso y 3er caso: se acabó quantum y/o proceso*/
+
+    Process* otro;
+    if (queue -> count > 1) {                   /*2do caso: hay más procesos en esta queue*/
+        if (cur == queue -> puntero_final) {    /*Caso 2-a: tenemos que volver a principio queue*/
+            printf("En caso 2-a\n");
+            otro = queue -> puntero_inicio;
+        } else {                                /*Caso 2-b: seguimos con el siguiente*/
+            printf("En caso 2-b\n");
+            otro = cur -> siguiente_q;
+        }
+        cur -> interrups++;                     /*Sumamos 1 a interrupciones del proceso*/
         strcpy(cur -> estado, "re");
-        if (cur == queue -> puntero_final) { /*Si estamos al final, volver al principio*/
-            cur = queue -> puntero_inicio;
-        } else { /*avanzar al siguiente en otro caso*/
-            cur = cur -> siguiente_q;
+        if (cur -> cur_burst_value != 0 || cur -> cur_burst_idx == cur -> count - 1) { /*Proceso no ha terminado*/
+            bajar_prioridad(cur, queue, QueueArray, quantum);
         }
+        return otro;
+    } else {                                    /*3er caso: hay que ir a la siguiente queue*/
+        printf("En caso 3\n");
+        int qq = 0;
+
+        queue = QueueArray[qq];
+        while (queue -> count == 0) {
+            if (qq == sizeof(QueueArray) / sizeof(QueueArray[0]) - 1) {     /*Última queue y no hay nadie*/
+                return (Process*) NULL;
+            } else {
+                qq++;
+                queue = QueueArray[qq];
+            }
+        }
+        strcpy(cur -> estado, "fi");
+        if (cur != NULL) {
+            if (cur -> cur_quantum == 0 && cur -> cur_burst_value > 0) { /*Estamos acá porque se acabó el quantum, no el proceso*/
+                bajar_prioridad(cur, queue, QueueArray, quantum);
+                strcpy(cur -> estado, "fi");
+                cur = queue -> puntero_inicio;
+                strcpy(cur -> estado, "ru");
+                return cur;
+            }
+        } else {
+            return (Process*) NULL;
+        }
+           
     }
 }
 
 
 
 /*Funcion que revisa llegadas */
-void revisar_llegadas(LinkedList * puntero_bodega, int t, int queues, LinkedList* QueueArray[queues], int quantum)
+Process* revisar_llegadas(LinkedList * puntero_bodega, int t, int queues, LinkedList* QueueArray[queues], int quantum, Process* in_cpu)
 { 
 
     int k;
@@ -159,11 +191,18 @@ void revisar_llegadas(LinkedList * puntero_bodega, int t, int queues, LinkedList
         }
         puntero_actual = puntero_siguiente;
     }
-    printf("Entre fors\n");
+
     for (int i=0; i < queues; i++) {
-    	printf("ACA, llamando a round_robin en queue %d, que tiene %d elemento(s)\n", i, QueueArray[i] -> count);
-    	round_robin(QueueArray[i], quantum, QueueArray);
+    	// printf("ACA, llamando a round_robin en queue %d, que tiene %d elemento(s)\n", i, QueueArray[i] -> count);
+        if (QueueArray[i] -> count > 0) {
+            printf("Llamando a round_robin en queue %d, la primera con al menos un elemento\n", i);
+            Process* in_cpu_2 = round_robin(QueueArray[i], quantum, QueueArray, in_cpu);
+            return in_cpu_2;
+        }
+    	
     }
+
+    return (Process*) NULL;
 }
 /*Fin revisar llegadas */
 
