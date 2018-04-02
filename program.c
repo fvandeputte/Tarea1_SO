@@ -24,8 +24,25 @@ Process* process_init(int pid, char * name, int start_time, int count, int* list
 
 
 LinkedList* create_queue() {
-	LinkedList* queue;
-	Process* aux;
+	LinkedList* queue = malloc(sizeof(LinkedList*));
+	Process* aux = malloc(sizeof(Process*));
+    aux -> pid = 0;
+    aux -> name[255] = NULL;
+    aux -> start_time = 0;
+    aux -> count = 0;
+    aux -> array = NULL;
+    aux -> cur_burst_idx = 0;                  /*Índice de burst que toca*/
+    aux -> cur_burst_value = 0;                /*Pero si ya lleva un poco de la burst actual, aquí decimos cuánto queda*/
+    aux -> cur_quantum = 0;
+    aux -> siguiente = NULL;         /*Usado para bodega inicial*/
+    aux -> siguiente_q = NULL;       /*Usado para queue*/
+    aux -> estado[2] = NULL;                     /*estados ru, re, fi */
+    aux -> elegido_cpu = 0;
+    aux -> interrups = 0;
+    aux -> turnaround_t = 0;
+    aux -> response_t = 0;
+    aux -> waiting_t = 0;
+
 	queue -> puntero_inicio = aux;
 	queue -> puntero_final = aux;
 	queue -> count = 0;
@@ -75,7 +92,7 @@ LinkedList * input_read(char *path){
                 pch = strtok (NULL, " ");
               }
         pid += 1; 
-        Process* p = process_init(pid, name, start_time, n, lista_enteros, puntero_bodega); 
+        process_init(pid, name, start_time, n, lista_enteros, puntero_bodega); 
 
     }
     return puntero_bodega;
@@ -98,7 +115,7 @@ void bajar_prioridad(Process* cur, LinkedList* queue, LinkedList* QueueArray[], 
 Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], Process* in_cpu) {
 	Process* cur = queue -> puntero_inicio;
     if (cur -> cur_quantum == -1) {
-        cur -> cur_quantum = quantum;
+        cur -> cur_quantum = quantum; 
     }
     /*Caso 0: no hay nadie en CPU y tiene que entrar alguien*/
     if (in_cpu == NULL) {
@@ -171,6 +188,7 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
         }
            
     }
+    return (Process*) NULL;
 }
 
 
@@ -260,7 +278,7 @@ void linkedlist_remove(LinkedList* list, Process* process, int Q) { /*Q = 0 es a
 			Process* prev;
 			while (cur != process) {
 				prev = cur;
-				cur -> siguiente;
+				cur = cur -> siguiente;
 			}
 			prev -> siguiente = cur -> siguiente;
 		}
@@ -274,7 +292,7 @@ void linkedlist_remove(LinkedList* list, Process* process, int Q) { /*Q = 0 es a
 			Process* prev;
 			while (cur != process) {
 				prev = cur;
-				cur -> siguiente_q;
+				cur = cur -> siguiente_q;
 			}
 			prev -> siguiente = cur -> siguiente_q;
 		}

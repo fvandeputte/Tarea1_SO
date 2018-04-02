@@ -54,7 +54,7 @@ Process* revisar_llegadas(LinkedList * puntero_bodega, int t, int queues, Linked
 
 /*Funciones de process */
 Process* process_init(int pid, char * name, int  start_time, int  count, int * lista, LinkedList * pointer_lista);
-/* Fin funciones de process
+/* Fin funciones de process */
 
 
 
