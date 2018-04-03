@@ -3,6 +3,4 @@
 
 -Estadísticas (interrupciones en algunos casos se cuentan, tiempos nunca)
 
--Handler si Ctrl+C
-
--Ver qué onda error en MAC (y en Linux: en el servidor no tira error pero se queda pegado)
+-Hacer v2 y v3

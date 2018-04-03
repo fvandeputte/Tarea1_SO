@@ -119,13 +119,13 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
     }
     /*Caso 0: no hay nadie en CPU y tiene que entrar alguien*/
     if (in_cpu == NULL) {
-        if (queue -> count > 0) { /*No es necesario: revisar_llegada lo asegura así*/
+        if (queue -> count > 0) { /*No es necesario chequearlo en verdad: revisar_llegada lo asegura así*/
             printf("Caso 0\n");
             return queue -> puntero_inicio;
         }
     }
 
-    while (cur != in_cpu) {
+    while (cur != in_cpu) { /*Tenemos que encontrar al proceso que está en la CPU (no es necesariamente el primero)*/
         cur = cur -> siguiente_q;
     }
 
@@ -135,11 +135,12 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
         printf("En caso 1\n");
         cur -> cur_quantum--;
         if (cur -> cur_burst_value > 0) {   /*En este burst*/
-            cur -> cur_burst_value--;
         } else {
             cur -> cur_burst_idx++;         /*Siguiente burst*/
             cur -> cur_burst_value = cur -> array[cur -> cur_burst_idx];
         }
+        cur -> cur_burst_value--;
+        cur -> cur_quantum--;
         //sumar a tiempo de procesamiento 1
         return cur;
     }
