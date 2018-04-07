@@ -47,7 +47,7 @@ struct queue
 LinkedList * input_read(char path[]);                           /*declaramos funcion para leer*/
 
 
-Process* revisar_llegadas(LinkedList * puntero_bodega, int t, int queues, LinkedList* QueueArray[queues], int quantum, Process* in_cpu);      /*revisar llegadas */
+void revisar_llegadas(LinkedList * puntero_bodega, int t, LinkedList* queue);      /*revisar llegadas */
 
 
 
@@ -65,3 +65,8 @@ void linkedlist_append(LinkedList* list, Process* process, int Q); /*Q = 0 es ap
 void linkedlist_remove(LinkedList* list, Process* process, int Q); /*Q = 0 es append en bodega, 1 en Queue*/
 /* Fin funciones de linked list */
 
+
+
+Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], Process* in_cpu, int t);
+Process* encontrar_siguiente_proceso(Process* in_cpu, LinkedList* queue, LinkedList* QueueArray[], int quantum, int t);
+Process* wrapper_rr(int queues, LinkedList* QueueArray[queues], int quantum, Process* in_cpu, int t);
