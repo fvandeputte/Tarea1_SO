@@ -100,7 +100,6 @@ LinkedList * input_read(char *path){
 /* Fin lectura archivo */
 
 void bajar_prioridad(Process* in_cpu, LinkedList* queue, LinkedList* QueueArray[], int quantum) {
-	int n = sizeof(QueueArray) / sizeof(QueueArray[0]);
 	LinkedList* queue_check = QueueArray[0];
 	int y = 0;
 	while (queue_check != queue) {
@@ -109,7 +108,7 @@ void bajar_prioridad(Process* in_cpu, LinkedList* queue, LinkedList* QueueArray[
 	linkedlist_remove(queue, in_cpu, 1);
 	linkedlist_append(QueueArray[y+1], in_cpu, 1);
 	in_cpu -> cur_quantum = quantum;
-	printf("Movimos de queue n° %d a %d\n", y, y+1);
+	printf("Movimos el proceso %s de queue n° %d a %d\n", in_cpu -> name, y, y+1);
 }
 
 
@@ -119,7 +118,7 @@ Process* wrapper_rr(int queues, LinkedList* QueueArray[queues], int quantum, Pro
         // printf("ACA, llamando a round_robin en queue %d, que tiene %d elemento(s)\n", i, QueueArray[i] -> count);
         if (QueueArray[i] -> count > 0) {
             printf("Llamando a round_robin en queue %d, la primera con al menos un elemento\n", i);
-            Process* in_cpu_2 = round_robin(QueueArray[i], quantum, QueueArray, in_cpu, t);
+            Process* in_cpu_2 = round_robin(QueueArray[i], quantum, QueueArray, in_cpu, t, queues);
             return in_cpu_2;
         }
         
@@ -129,7 +128,7 @@ Process* wrapper_rr(int queues, LinkedList* QueueArray[queues], int quantum, Pro
 } 
 
 
-Process* encontrar_siguiente_proceso(Process* in_cpu, LinkedList* queue, LinkedList* QueueArray[], int quantum, int t) {
+Process* encontrar_siguiente_proceso(Process* in_cpu, LinkedList* queue, LinkedList* QueueArray[], int quantum, int t, int queues) {
     Process* otro;
     if (queue -> count > 0) {                   
         if (in_cpu == queue -> puntero_final) {    /*Caso 2-a: tenemos que volver a principio queue*/
@@ -141,15 +140,31 @@ Process* encontrar_siguiente_proceso(Process* in_cpu, LinkedList* queue, LinkedL
         strcpy(in_cpu -> estado, "re");
         strcpy(otro -> estado, "ru");
         return otro;
-    } else {  
-        printf("Buscando en una lista de abajo\n");                                  /*3er caso: hay que ir a la siguiente queue*/
-        return wrapper_rr(sizeof(QueueArray) / sizeof(QueueArray[0]), QueueArray, quantum, in_cpu, t);
+    } 
+    else {  
+        
+
+         /*3er caso: hay que ir a la siguiente queue*/
+        //return wrapper_rr(sizeof(QueueArray) / sizeof(QueueArray[0]), QueueArray, quantum, in_cpu, t); me da miedo
+        for (int i=0; i < queues; i++) {
+        
+            if (QueueArray[i] -> count > 0) {
+                
+                Process* in_cpu_2 = QueueArray[i] -> puntero_inicio;
+                
+                return in_cpu_2;
+            }   
+        }
+    
+
     }
 }
 
+        
 
 
-Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], Process* in_cpu, int t) {
+
+Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], Process* in_cpu, int t, int queues) {
 
     if (in_cpu && in_cpu -> cur_quantum == -1) {
         in_cpu -> cur_quantum = quantum; 
@@ -162,6 +177,10 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
         strcpy(in_cpu -> estado, "ru");
         return in_cpu;
     }
+    else {
+        in_cpu -> cur_burst_value--;
+        in_cpu -> cur_quantum--;
+    }
 
     if (in_cpu -> cur_quantum > 0 && (in_cpu -> cur_burst_value > 0 || in_cpu -> cur_burst_idx < in_cpu -> count - 1)) {
     /*1er caso: todavía queda quantum y queda algún burst, sigue el mismo en CPU ()*/
@@ -170,8 +189,7 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
             in_cpu -> cur_burst_idx++;         /*Siguiente burst*/
             in_cpu -> cur_burst_value = in_cpu -> array[in_cpu -> cur_burst_idx];
         }
-        in_cpu -> cur_burst_value--;
-        in_cpu -> cur_quantum--;
+       
         //sumar a tiempo de procesamiento 1
         printf("cur_quantum: %d; cur_burst_value: %d\n", in_cpu -> cur_quantum, in_cpu -> cur_burst_value);
         return in_cpu;
@@ -183,7 +201,7 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
         linkedlist_remove(queue, in_cpu, 1);
         strcpy(in_cpu -> estado, "fi");
         printf("cur_quantum: %d; cur_burst_value: %d\n", in_cpu -> cur_quantum, in_cpu -> cur_burst_value);
-        return encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t);
+        return encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t, queues);
     }
 
     /*2do caso: se me acaba quantum*/
@@ -194,9 +212,8 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
         }
 
         bajar_prioridad(in_cpu, queue, QueueArray, quantum);
-        printf("cur_quantum: %d; cur_burst_value: %d\n", in_cpu -> cur_quantum, in_cpu -> cur_burst_value);
         sleep(1);
-        in_cpu = encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t);
+        in_cpu = encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t, queues);
         return in_cpu;
     }
 
@@ -224,7 +241,19 @@ void revisar_llegadas(LinkedList * puntero_bodega, int t, LinkedList* queue)
         puntero_actual = puntero_siguiente;
     }
 }
-/*Fin revisar llegadas */
+void imprimir_colas(LinkedList * QueueArray[], int total){
+    for (int i= 0; i < total; i++){
+        
+        if (QueueArray[i] -> count == 0){
+            printf("Cola %i: vacia\n",i);
+        }
+        else{
+            printf("Cola %i tiene los procesos: \n", i);
+            linkedlist_imprimir(QueueArray[i]);
+        }
+    }
+
+}
 
 
 
@@ -309,4 +338,13 @@ void linkedlist_remove(LinkedList* list, Process* process, int Q) { /*Q = 0 es r
 	list -> count--;
 }
 
+void linkedlist_imprimir(LinkedList * list){
+    Process * curr;
+    curr = list -> puntero_inicio;
+    while (curr != list -> puntero_final){
+        printf("Proceso: %s \n", curr -> name);
+        curr = curr -> siguiente_q;
+    }
+    printf("Proceso: %s \n", curr -> name);
+}
 /* Termino funciones de linked list */

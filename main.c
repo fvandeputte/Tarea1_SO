@@ -69,12 +69,13 @@ int main( int argc, char * argv [] ) {
             sleep(2);
             revisar_llegadas(bodega, t, QueueArray[0]);
             in_cpu = wrapper_rr(queues, QueueArray, quantum, in_cpu, t);
+            imprimir_colas(QueueArray, queues); 
             if (in_cpu == NULL) {
                 printf("Tiempo %d: proceso en CPU es NULL\n\n", t);
             } else {
                 printf("Tiempo %d: proceso en CPU es %s\n\n", t, in_cpu -> name);
             }
-            
+ 
         }
 
         imprimir_estadisticas(bodega);
