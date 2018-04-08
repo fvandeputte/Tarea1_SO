@@ -13,6 +13,7 @@ Process* process_init(int pid, char * name, int start_time, int count, int* list
     pointer -> cur_quantum = -1;
     pointer -> count = count;
     pointer -> array = lista;
+    pointer -> response_t = -1;
     pointer -> cur_burst_value = pointer -> array[0];
     pointer -> cur_burst_idx = 0;
     printf("Create Process object called: %s, with pid: %i, it has to start at: %li and have %li elements\n",
@@ -27,7 +28,7 @@ LinkedList* create_queue() {
 	LinkedList* queue = malloc(sizeof(LinkedList*));
 	Process* aux = malloc(sizeof(Process*));
     aux -> pid = 0;
-    aux -> name[255] = NULL;
+    // aux -> name[255] = NULL;
     aux -> start_time = 0;
     aux -> count = 0;
     aux -> array = NULL;
@@ -36,7 +37,7 @@ LinkedList* create_queue() {
     aux -> cur_quantum = 0;
     aux -> siguiente = NULL;         /*Usado para bodega inicial*/
     aux -> siguiente_q = NULL;       /*Usado para queue*/
-    aux -> estado[2] = NULL;                     /*estados ru, re, fi */
+    // aux -> estado[2] = NULL;                     /*estados ru, re, fi */
     aux -> elegido_cpu = 0;
     aux -> interrups = 0;
     aux -> turnaround_t = 0;
@@ -174,12 +175,17 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
     if (in_cpu == NULL) {
         printf("Caso 0\n");
         in_cpu = queue -> puntero_inicio;
+        if (in_cpu -> response_t == -1) { /*Nunca ha entrado*/
+            in_cpu -> response_t = t - in_cpu -> start_time;
+        }
         strcpy(in_cpu -> estado, "ru");
         return in_cpu;
     }
     else {
         in_cpu -> cur_burst_value--;
         in_cpu -> cur_quantum--;
+        in_cpu -> elegido_cpu++;
+        in_cpu -> processing_t++;
     }
 
     if (in_cpu -> cur_quantum > 0 && (in_cpu -> cur_burst_value > 0 || in_cpu -> cur_burst_idx < in_cpu -> count - 1)) {
@@ -189,7 +195,8 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
             in_cpu -> cur_burst_idx++;         /*Siguiente burst*/
             in_cpu -> cur_burst_value = in_cpu -> array[in_cpu -> cur_burst_idx];
         }
-       
+        in_cpu -> processing_t++;
+        in_cpu -> elegido_cpu++;
         //sumar a tiempo de procesamiento 1
         printf("cur_quantum: %d; cur_burst_value: %d\n", in_cpu -> cur_quantum, in_cpu -> cur_burst_value);
         return in_cpu;
@@ -198,6 +205,7 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
     /*3er caso: se me acaba proceso*/
     if (in_cpu -> cur_burst_value == 0 && in_cpu -> cur_burst_idx == in_cpu -> count - 1) {
         in_cpu -> turnaround_t = t - in_cpu -> start_time;
+        in_cpu -> waiting_t = in_cpu -> turnaround_t - in_cpu -> processing_t;
         linkedlist_remove(queue, in_cpu, 1);
         strcpy(in_cpu -> estado, "fi");
         printf("cur_quantum: %d; cur_burst_value: %d\n", in_cpu -> cur_quantum, in_cpu -> cur_burst_value);
@@ -214,6 +222,9 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
         bajar_prioridad(in_cpu, queue, QueueArray, quantum);
         sleep(1);
         in_cpu = encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t, queues);
+        if (in_cpu -> response_t == -1) { /*Nunca ha entrado: no estoy seguro que sea necesario en este caso*/
+            in_cpu -> response_t = t - in_cpu -> start_time;
+        }
         return in_cpu;
     }
 

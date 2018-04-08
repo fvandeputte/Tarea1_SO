@@ -15,6 +15,7 @@ struct process {
     int interrups;
     int turnaround_t;
     int response_t;
+    int processing_t;
     int waiting_t;
 
 };
