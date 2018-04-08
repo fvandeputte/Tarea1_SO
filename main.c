@@ -70,7 +70,6 @@ int main( int argc, char * argv [] ) {
             return 0;
         } else {
             s = atoi(argv[5]);
-            // hacer versiones 2 y 3
         }
         
     }
@@ -87,8 +86,7 @@ int main( int argc, char * argv [] ) {
     /*iniciar simulacion */
 
     if (strcmp(version, "v1") == 0) {
-        Process* in_cpu = (Process*) NULL; /*algún proceso basura para la primera iteración*/
-        // for (int t=0; t < 40; t++){   /* Aqui falta ponerle una condicion de término */
+        Process* in_cpu = (Process*) NULL;                      /*algún proceso basura para la primera iteración*/
         int max_start_time = calc_max_start(bodega);
         int t = 0;
         T = t;
@@ -108,8 +106,7 @@ int main( int argc, char * argv [] ) {
 
         imprimir_estadisticas(bodega);
     } else if (strcmp(version, "v2") == 0) {
-        Process* in_cpu = (Process*) NULL; /*algún proceso basura para la primera iteración*/
-        // for (int t=0; t < 40; t++){   /* Aqui falta ponerle una condicion de término */
+        Process* in_cpu = (Process*) NULL;                     /*algún proceso basura para la primera iteración*/
         int max_start_time = calc_max_start(bodega);
         printf("Max start time is %d\n", max_start_time);
         int t = 0;
@@ -136,9 +133,8 @@ int main( int argc, char * argv [] ) {
         }
 
         imprimir_estadisticas(bodega);
-    } else { /* v3 */
-        Process* in_cpu = (Process*) NULL; /*algún proceso basura para la primera iteración*/
-        // for (int t=0; t < 40; t++){   /* Aqui falta ponerle una condicion de término */
+    } else {                                                /* v3 */
+        Process* in_cpu = (Process*) NULL;                  /*algún proceso basura para la primera iteración*/
         int max_start_time = calc_max_start(bodega);
         printf("Max start time is %d\n", max_start_time);
         int t = 0;
@@ -163,9 +159,6 @@ int main( int argc, char * argv [] ) {
             t++;
             T = t;
         }
-
         imprimir_estadisticas(bodega);
     }
-    
-
 }

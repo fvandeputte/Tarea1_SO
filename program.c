@@ -128,8 +128,6 @@ void bajar_prioridad(Process* in_cpu, LinkedList* queue, LinkedList* QueueArray[
     }
 }
 
-
-
 Process* wrapper_rr(int queues, LinkedList* QueueArray[queues], int quantum, Process* in_cpu, int t, int v3){
       for (int i=0; i < queues; i++) {
         if (QueueArray[i] -> count > 0) {
@@ -137,12 +135,9 @@ Process* wrapper_rr(int queues, LinkedList* QueueArray[queues], int quantum, Pro
             Process* in_cpu_2 = round_robin(QueueArray[i], quantum, QueueArray, in_cpu, t, queues, v3);
             return in_cpu_2;
         }
-        
     }
-
     return (Process*) NULL;
 } 
-
 
 int buscar_idx(LinkedList* queue, int queues, LinkedList* QueueArray[queues]) {
     for (int i=0; i < queues; i++) {
@@ -180,9 +175,6 @@ Process* encontrar_siguiente_proceso(Process* in_cpu, LinkedList* queue, LinkedL
         if (conteo_procesos(QueueArray, queues) == 1) {
             return in_cpu;
         }
-        // printf("----------------------\n");
-        // imprimir_colas(QueueArray, queues);
-        // printf("----------------------\n");
         for (int i=idx_queue+1; i < queues; i++) {
             if (QueueArray[i] -> count > 0) {
                 Process* in_cpu_2 = QueueArray[i] -> puntero_inicio;
@@ -312,7 +304,6 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
 /*Funcion que revisa llegadas */
 void revisar_llegadas(LinkedList * puntero_bodega, int t, LinkedList* queue)
 { 
-
     int k;
     Process *puntero_actual;
     Process *puntero_siguiente;
