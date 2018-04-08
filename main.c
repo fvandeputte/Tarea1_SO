@@ -41,12 +41,13 @@ int main( int argc, char * argv [] ) {
     /*queues */
     int queues = atoi(argv[4]);
     /* manejar el error en caso de que estemos en v1 y haya <S> */
+    int s;
     if (argc > 5){
         if (strcmp(version, "v1") == 0) { /*tirar error*/
             printf("Error: estamos en v1, y se dio argumento S\n");
             return 0;
         } else {
-            int s = atoi(argv[5]);
+            s = atoi(argv[5]);
             // hacer versiones 2 y 3
         }
         
@@ -65,8 +66,8 @@ int main( int argc, char * argv [] ) {
 
     if (strcmp(version, "v1") == 0) {
         Process* in_cpu = (Process*) NULL; /*algún proceso basura para la primera iteración*/
-        for (int t=0; t < 120; t++){   /* Aqui falta ponerle una condicion de término */
-            sleep(2);
+        for (int t=0; t < 40; t++){   /* Aqui falta ponerle una condicion de término */
+            sleep(1);
             revisar_llegadas(bodega, t, QueueArray[0]);
             in_cpu = wrapper_rr(queues, QueueArray, quantum, in_cpu, t);
             imprimir_colas(QueueArray, queues); 
@@ -79,7 +80,26 @@ int main( int argc, char * argv [] ) {
         }
 
         imprimir_estadisticas(bodega);
+    } else if (strcmp(version, "v2") == 0) {
+        Process* in_cpu = (Process*) NULL; /*algún proceso basura para la primera iteración*/
+        for (int t=0; t < 40; t++){   /* Aqui falta ponerle una condicion de término */
+            sleep(0);
+            revisar_llegadas(bodega, t, QueueArray[0]);
+            in_cpu = wrapper_rr(queues, QueueArray, quantum, in_cpu, t);
+            imprimir_colas(QueueArray, queues); 
+            if (in_cpu == NULL) {
+                printf("Tiempo %d: proceso en CPU es NULL\n\n", t);
+            } else {
+                printf("Tiempo %d: proceso en CPU es %s\n\n", t, in_cpu -> name);
+            }
+            if (t == s) { 
+                subir_prioridades(queues, QueueArray, in_cpu);
+                queues = 1;
+                linkedlist_imprimir(QueueArray[0]);
+            }
+        }
 
+        imprimir_estadisticas(bodega);
     }
     
 
