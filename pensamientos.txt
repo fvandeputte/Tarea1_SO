@@ -1,6 +1,2 @@
 
--Revisar que lógica esté bien, y ojalá simplificarla
-
--Estadísticas (interrupciones en algunos casos se cuentan, tiempos nunca)
-
--Hacer v2 y v3
+-Revisar estadísticas
