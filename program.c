@@ -221,6 +221,7 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
         in_cpu = queue -> puntero_inicio;
         if (in_cpu -> response_t == -1) { /*Nunca ha entrado*/
             in_cpu -> response_t = t - in_cpu -> start_time;
+            in_cpu -> elegido_cpu++;
         }
         strcpy(in_cpu -> estado, "ru");
         return in_cpu;
@@ -228,7 +229,6 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
     else {
         in_cpu -> cur_burst_value--;
         in_cpu -> cur_quantum--;
-        in_cpu -> elegido_cpu++;
         in_cpu -> processing_t++;
     }
 
@@ -238,6 +238,7 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
         in_cpu -> turnaround_t = t - in_cpu -> start_time;
         in_cpu -> waiting_t = in_cpu -> turnaround_t - in_cpu -> processing_t;
         Process* in_cpu2 = encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t, queues);
+        in_cpu2 -> elegido_cpu++;
         strcpy(in_cpu -> estado, "fi");
         printf("cur_quantum: %d; cur_burst_value: %d\n", in_cpu -> cur_quantum, in_cpu -> cur_burst_value);
         linkedlist_remove(queue, in_cpu, 1);
@@ -252,7 +253,9 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
             in_cpu -> cur_burst_value = in_cpu -> array[in_cpu -> cur_burst_idx];
             in_cpu -> interrups++;
             printf("cur_quantum: %d; cur_burst_value: %d\n", in_cpu -> cur_quantum, in_cpu -> cur_burst_value);
-            return encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t, queues);
+            Process* in_cpu2 = encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t, queues);
+            in_cpu2 -> elegido_cpu++;
+            return in_cpu2;
         } else {
             printf("cur_quantum: %d; cur_burst_value: %d\n", in_cpu -> cur_quantum, in_cpu -> cur_burst_value);
             return in_cpu;
@@ -270,6 +273,7 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
         if (in_cpu2 -> response_t == -1) { /*Nunca ha entrado: no estoy seguro que sea necesario en este caso*/
             in_cpu2 -> response_t = t - in_cpu2 -> start_time;
         }
+        in_cpu2 -> elegido_cpu++;
         printf("cur_quantum: %d; cur_burst_value: %d\n", in_cpu -> cur_quantum, in_cpu -> cur_burst_value);
         return in_cpu2;
     }
