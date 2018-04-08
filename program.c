@@ -167,7 +167,7 @@ Process* encontrar_siguiente_proceso(Process* in_cpu, LinkedList* queue, LinkedL
 }
 
 void concat(LinkedList* pegante, LinkedList* pegado) {
-    printf("pegante: %d, pegado: %d\n", pegante -> count, pegado -> count);
+    // printf("pegante: %d, pegado: %d\n", pegante -> count, pegado -> count);
     if (pegante -> puntero_final == NULL) {
         if (pegado -> puntero_inicio != NULL) {
             pegante -> puntero_inicio = pegado -> puntero_inicio;
@@ -179,13 +179,14 @@ void concat(LinkedList* pegante, LinkedList* pegado) {
             pegante -> puntero_final = pegado -> puntero_final;
         }         
     }
+    pegante -> count += pegado -> count;
     
 }
 
 void linkedlist_imprimir(LinkedList * list);
 
 void subir_prioridades(int queues, LinkedList* QueueArray[queues], Process* in_cpu) {
-    printf("queues: %d\n", queues);
+    // printf("queues: %d\n", queues);
     for (int i=1; i < queues; i++) {
         // linkedlist_imprimir(QueueArray[0]);
         // printf("\n\n");
@@ -265,7 +266,6 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
             in_cpu -> cur_burst_value = in_cpu -> array[in_cpu -> cur_burst_idx];
         }
         Process* in_cpu2 = encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t, queues);
-        printf("HHH\n");
         bajar_prioridad(in_cpu, queue, QueueArray, quantum, queues);
         if (in_cpu2 -> response_t == -1) { /*Nunca ha entrado: no estoy seguro que sea necesario en este caso*/
             in_cpu2 -> response_t = t - in_cpu2 -> start_time;
