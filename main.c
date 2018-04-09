@@ -104,7 +104,7 @@ int main( int argc, char * argv [] ) {
             T = t;
         }
 
-        imprimir_estadisticas(bodega);
+        imprimir_estadisticas();
     } else if (strcmp(version, "v2") == 0) {
         Process* in_cpu = (Process*) NULL;                     /*algún proceso basura para la primera iteración*/
         int max_start_time = calc_max_start(bodega);
@@ -132,7 +132,7 @@ int main( int argc, char * argv [] ) {
             T = t;
         }
 
-        imprimir_estadisticas(bodega);
+        imprimir_estadisticas();
     } else {                                                /* v3 */
         Process* in_cpu = (Process*) NULL;                  /*algún proceso basura para la primera iteración*/
         int max_start_time = calc_max_start(bodega);
@@ -159,6 +159,6 @@ int main( int argc, char * argv [] ) {
             t++;
             T = t;
         }
-        imprimir_estadisticas(bodega);
+        imprimir_estadisticas();
     }
 }

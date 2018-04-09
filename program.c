@@ -256,7 +256,9 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
         in_cpu -> turnaround_t = t - in_cpu -> start_time;
         in_cpu -> waiting_t = in_cpu -> turnaround_t - in_cpu -> processing_t;
         Process* in_cpu2 = encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t, queues);
-        in_cpu2 -> elegido_cpu++;
+        if (in_cpu != in_cpu2) {
+            in_cpu2 -> elegido_cpu++;
+        }
         strcpy(in_cpu -> estado, "fi");
         linkedlist_remove(queue, in_cpu, 1);
         return in_cpu2;

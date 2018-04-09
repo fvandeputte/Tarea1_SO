@@ -30,7 +30,7 @@ Response time: 0
 Waiting time: 6
 
 PROCESS2
-Turnos de CPU: 5
+Turnos de CPU: 4
 Bloqueos: 3
 Turnaround time: 18
 Response time: 2
