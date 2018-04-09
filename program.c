@@ -256,7 +256,7 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
 
     if (in_cpu && in_cpu -> cur_quantum == -1) {
         if (v3) {
-            in_cpu -> cur_quantum = quantum * (buscar_idx(queue, queues, QueueArray) + 1); 
+            in_cpu -> cur_quantum = quantum * (buscar_idx(mi_queue(in_cpu, QueueArray, queues), queues, QueueArray) + 1); 
         } else {
             in_cpu -> cur_quantum = quantum; 
         }
@@ -298,9 +298,12 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
 
     /*Caso sigo o se acaba burst*/
     if (in_cpu -> cur_quantum > 0) {
+        printf("Caso quantum > 0\n");
         if (in_cpu -> cur_burst_value == 0) {
             if (v3) {
-                in_cpu -> cur_quantum = quantum * (buscar_idx(queue, queues, QueueArray) + 1); 
+                // printf("buscar_idx es %d\n", buscar_idx(queue, queues, QueueArray));
+                // printf("buscar_idx con mi_q es %d\n", buscar_idx(mi_queue(in_cpu, QueueArray, queues), queues, QueueArray));
+                in_cpu -> cur_quantum = quantum * (buscar_idx(mi_queue(in_cpu, QueueArray, queues), queues, QueueArray) + 1); 
             } else {
                 in_cpu -> cur_quantum = quantum; 
             }
@@ -317,13 +320,22 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
                             Process* sig = in_cpu -> siguiente_q;
                             if (sig == NULL) {
                                 QueueArray[i] -> puntero_inicio -> elegido_cpu++;
+                                if (QueueArray[i] -> puntero_inicio -> response_t == -1) {
+                                    QueueArray[i] -> puntero_inicio -> response_t = t - QueueArray[i] -> puntero_inicio -> start_time;
+                                }
                                 return QueueArray[i] -> puntero_inicio;
                             } else {
                                 sig -> elegido_cpu++;
+                                if (sig -> response_t == -1) {
+                                    sig -> response_t = t - sig -> start_time;
+                                }
                                 return sig;
                             }
                         }
                         QueueArray[i] -> puntero_inicio -> elegido_cpu++;
+                        if (QueueArray[i] -> puntero_inicio -> response_t == -1) {
+                            QueueArray[i] -> puntero_inicio -> response_t = t - QueueArray[i] -> puntero_inicio -> start_time;
+                        }
                         return QueueArray[i] -> puntero_inicio;
                     }
                 }

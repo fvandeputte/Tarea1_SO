@@ -40,7 +40,39 @@ Waiting time: 6
 Por lo tanto, hasta aquí todo bien. Ahora veamos un caso en el que se diferencian, y comparemos qué versión obtiene mejores métricas:
 
 ```
-[INSERTAR OTRO CASO]
+PROCESS0 5 3 4 3 5
+PROCESS1 11 3 1 4 7
+PROCESS2 14 2 14 2
+```
+
+En la versión 1 encontramos que se retornan los siguientes valores (y que, calzando con el test entregado, comprueban corrección de algoritmo):
+
+```
+Procesos terminados: 3
+Tiempo total: 45
+
+PROCESS0:
+Turnos de CPU: 5
+Bloqueos: 3
+Turnaround time: 32
+Response time: 0
+Waiting time: 20
+
+PROCESS1:
+Turnos de CPU: 6
+Bloqueos: 3
+Turnaround time: 30
+Response time: 1
+Waiting time: 18
+
+PROCESS2:
+Turnos de CPU: 6
+Bloqueos: 4
+Turnaround time: 31
+Response time: 2
+Waiting time: 15
 ```
 
 
+
+Sabemos que el tiempo total de simulación tiene que ser igual en todos los casos, ya que los procesos son iguales en los tres escenarios, y en ninguno habrá momentos idle de la CPU extra.
