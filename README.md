@@ -74,5 +74,11 @@ Waiting time: 15
 ```
 
 
+(No se incorporan resultados de v2 y v3 para hacer este informe lo más breve posible: las similitudes y diferencias relevantes se mencionarán.)
 
-Sabemos que el tiempo total de simulación tiene que ser igual en todos los casos, ya que los procesos son iguales en los tres escenarios, y en ninguno habrá momentos idle de la CPU extra.
+Sabemos que el tiempo total de simulación tiene que ser igual en todos los casos, ya que los procesos son iguales en los tres escenarios, y en ninguno habrá momentos idle de la CPU extra. Esto lo corroboramos en nuestros resultados.
+
+Por teoría, conocemos que MLFQ busca reducir el response time y el turnaround time. Según los casos testeados, el response time no se vio afectado, ni negativa ni positivamente a través de las versiones. Esto es muy positivo para las versiones 2 y 3: pueden mejorar el turnaround time sin afectar negativamente el response time (incorporar el aging solo podría empeorar el response time, ya que le quita "protagonismo" a los procesos nuevos, ya que comparten la primera cola). Y, efectivamente, en el turnaround time la diferencia sí es notoria. En los resultados de arriba, la versión 1 muestra un promedio de turnaround time de 31. Sin embargo, en la versión 3 el promedio fue de 29. Si bien puede parecer pequeña la diferencia, para algoritmos tan optimizados un 7% es una diferencia notoria. Además, es muy probable que la diferencia solo incremente a medida que se va saturando el sistema, ya que la starvation empeora a medida que llegan más procesos, y algunos tienen burst más largos. De la mano de un menor turnaround time viene un menor waiting time (es la misma diferencia absoluta, y aun mayor relativamente que la del 7% del turnaround time).
+
+En síntesis, si bien para incorporar un scheduler en ámbitos productivos la experimentación debe ser mucho más extensiva, hay fuertes indicios de que la regla del aging conlleva un mejor desempeño en términos de turnaround time y waiting time. No se encontraron indicios claros, en este nivel de saturación de un sistema (quizás con miles de procesos el caso sería distinto), para la regla del quantum diferenciado por prioridad. Sin embargo, es una regla que apunta en la misma dirección que el resto del algoritmo. Es decir, el response time debería quedar más o menos igual, mientras que el turnaround time, al acortar los peores casos, debería disminuir un poco, junto con el waiting time.
+
