@@ -17,6 +17,7 @@ struct process {
     int response_t;
     int processing_t;
     int waiting_t;
+    int no_bajar;
 
 };
 typedef struct process Process;

@@ -112,12 +112,13 @@ void bajar_prioridad(Process* in_cpu, LinkedList* queue, LinkedList* QueueArray[
 
 
     if (y < queues - 1) {
-        printf("Antes de remove \n");
-        printf("Numero de elementos en la cola :%i\n", queue -> count);
-        printf("Proceso al inicio :%s\n", queue -> puntero_inicio -> name);
-        linkedlist_remove(queue, in_cpu, 1);
-        printf("Despues de remove \n");
+        // printf("Antes de remove \n");
+        queue = mi_queue(in_cpu, QueueArray, queues);
+        // printf("Numero de elementos en la cola :%i\n", queue -> count);
+        // printf("Proceso al inicio :%s\n", queue -> puntero_inicio -> name);
+        linkedlist_remove(mi_queue(in_cpu, QueueArray, queues), in_cpu, 1);
         linkedlist_append(QueueArray[y+1], in_cpu, 1);
+        // printf("Despues de remove: cont es %d \n", queue -> count);
        
         if (v3) {
             // printf("buscar_idx retorna %d\n", buscar_idx(QueueArray[y+1], queues, QueueArray));
@@ -170,7 +171,21 @@ Process* encontrar_siguiente_proceso(Process* in_cpu, LinkedList* queue, LinkedL
     /****** Esto es lo nuevo          **********************************************************************************/
 
     if (QueueArray[0] -> count > 0 && !(QueueArray[0] -> count == 1  && QueueArray[0] -> puntero_final == in_cpu)) {
-        otro = QueueArray[0] -> puntero_inicio;
+        if (in_cpu != QueueArray[0] -> puntero_inicio) {
+            otro = QueueArray[0] -> puntero_inicio;
+        } else {
+            if (QueueArray[0] -> count > 1) {
+                otro = QueueArray[0] -> puntero_inicio -> siguiente_q;
+            } else {
+                for (int i=1; i<queues; i++) {
+                    if (QueueArray[i] -> count > 0) {
+                        return QueueArray[i] -> puntero_inicio;
+                    }
+                }
+                return (Process*) NULL;
+            }
+        }
+        
         return otro;
     }
     /****** Reviso que haya llegado alguien. **/
@@ -212,7 +227,10 @@ void concat(LinkedList* pegante, LinkedList* pegado) {
             pegante -> puntero_final = pegado -> puntero_final;
         }         
     }
-    pegante -> count += pegado -> count;    
+    pegante -> count += pegado -> count;
+    pegado -> count = 0;
+    pegado -> puntero_inicio = NULL;
+    pegado -> puntero_final = NULL;
 }
 
 void linkedlist_imprimir(LinkedList * list);
@@ -264,7 +282,6 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
 
     /*Caso 0: no hay nadie en CPU y tiene que entrar alguien*/
     if (in_cpu == NULL) {
-        printf("Caso 0\n");
         in_cpu = queue -> puntero_inicio;
         if (in_cpu -> response_t == -1) { /*Nunca ha entrado*/
             in_cpu -> response_t = t - in_cpu -> start_time;
@@ -298,22 +315,16 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
 
     /*Caso sigo o se acaba burst*/
     if (in_cpu -> cur_quantum > 0) {
-        printf("Caso quantum > 0\n");
         if (in_cpu -> cur_burst_value == 0) {
             if (v3) {
-                // printf("buscar_idx es %d\n", buscar_idx(queue, queues, QueueArray));
-                // printf("buscar_idx con mi_q es %d\n", buscar_idx(mi_queue(in_cpu, QueueArray, queues), queues, QueueArray));
                 in_cpu -> cur_quantum = quantum * (buscar_idx(mi_queue(in_cpu, QueueArray, queues), queues, QueueArray) + 1); 
             } else {
                 in_cpu -> cur_quantum = quantum; 
             }
             in_cpu -> cur_burst_idx++;         /*Siguiente burst*/
             in_cpu -> cur_burst_value = in_cpu -> array[in_cpu -> cur_burst_idx];
-            // in_cpu -> interrups++;
             Process* in_cpu2;
-            printf("0\n");
             if (mi_queue(in_cpu, QueueArray, queues) != QueueArray[0]) {
-                printf("1\n");
                 for (int i = 0; i < queues; i++) {
                     if (QueueArray[i] -> count > 0) {
                         if (QueueArray[i] == mi_queue(in_cpu, QueueArray, queues)) {
@@ -340,14 +351,11 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
                     }
                 }
             } else {
-                printf("2\n");
                 if (mi_queue(in_cpu, QueueArray, queues) -> count > 1) {
-                    printf("3\n");
                     if (in_cpu == mi_queue(in_cpu, QueueArray, queues) -> puntero_final) {
                         mi_queue(in_cpu, QueueArray, queues) -> puntero_inicio -> elegido_cpu++;
                         return mi_queue(in_cpu, QueueArray, queues) -> puntero_inicio;
                     } else {
-                        printf("Elegimos para entrar a %s\n", in_cpu -> siguiente_q -> name);
                         in_cpu -> siguiente_q -> elegido_cpu++;
                         return in_cpu -> siguiente_q;
                     }
@@ -356,8 +364,6 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
                 return in_cpu;
             }
 
-            // in_cpu2 = encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t, queues);
-            // in_cpu2 -> elegido_cpu++;
             if (in_cpu2 -> response_t == -1) { /*Nunca ha entrado: no estoy seguro que sea necesario en este caso*/
                 in_cpu2 -> response_t = t - in_cpu2 -> start_time;
             }
@@ -371,35 +377,42 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
 
     /*Caso se me acaba quantum*/
     if (in_cpu -> cur_quantum == 0) {
-        printf("Se me acabo el quantum \n");
+        // printf("Se me acabo el quantum \n");
         in_cpu -> interrups++;
-        if (in_cpu -> cur_burst_value == 0) {
-            in_cpu -> cur_burst_idx++;
-            in_cpu -> cur_burst_value = in_cpu -> array[in_cpu -> cur_burst_idx];
-        }
-        // Process* in_cpu2 = encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t, queues);
-        // printf("Proceso nuevo: %s\n", in_cpu2 -> name);
-        // printf("Proceso viejo al cual le bajo la prioridad: %s\n", in_cpu -> name);
-        // printf("En la cola: %i\n", buscar_idx(queue, queues, QueueArray));
-        LinkedList *queue_a_buscar;
-        queue_a_buscar = mi_queue(in_cpu, QueueArray, queues);
         Process* sig = in_cpu -> siguiente_q;
+        if (in_cpu -> no_bajar) {
+            // printf("Estoy en no_bajar\n");
+            if (in_cpu -> cur_burst_value == 0) {
+                in_cpu -> cur_burst_idx++;
+                in_cpu -> cur_burst_value = in_cpu -> array[in_cpu -> cur_burst_idx];
+            }
+            linkedlist_remove(QueueArray[0], in_cpu, 1);
+            linkedlist_append(QueueArray[0], in_cpu, 1);
+            in_cpu -> cur_quantum = quantum;
+            in_cpu -> no_bajar = 0;
+        } else {
+            if (in_cpu -> cur_burst_value == 0) {
+                in_cpu -> cur_burst_idx++;
+                in_cpu -> cur_burst_value = in_cpu -> array[in_cpu -> cur_burst_idx];
+            }
 
-        bajar_prioridad(in_cpu, queue_a_buscar, QueueArray, quantum, queues, v3);
+            LinkedList *queue_a_buscar;
+            queue_a_buscar = mi_queue(in_cpu, QueueArray, queues);
 
-        
+            bajar_prioridad(in_cpu, queue_a_buscar, QueueArray, quantum, queues, v3);
+            // imprimir_colas(QueueArray, queues);
+        }
+
         Process* in_cpu2;
         if (QueueArray[0] -> count > 0) {
-            // QueueArray[0] -> puntero_inicio -> elegido_cpu++;
             in_cpu2 = QueueArray[0] -> puntero_inicio;
         } else {
-
             if (sig != NULL) {
-                printf("En caso sig != NULL");
                 in_cpu2 = sig;            
             } else {
                 for (int i=0; i<queues; i++) {
                     if (QueueArray[i] -> count > 0) {
+                        linkedlist_imprimir(QueueArray[i]);
                         in_cpu2 = QueueArray[i] -> puntero_inicio;
                         break;
                     }

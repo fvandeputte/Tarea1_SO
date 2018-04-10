@@ -94,7 +94,7 @@ int main( int argc, char * argv [] ) {
             // sleep(1);
             revisar_llegadas(bodega, t, QueueArray[0]);
             in_cpu = wrapper_rr(queues, QueueArray, quantum, in_cpu, t, 0);
-            imprimir_colas(QueueArray, queues); 
+            // imprimir_colas(QueueArray, queues); 
             if (in_cpu == NULL) {
                 printf("Tiempo %d: proceso en CPU es NULL\n\n", t);
             } else {
@@ -115,18 +115,15 @@ int main( int argc, char * argv [] ) {
             // sleep(1);
             revisar_llegadas(bodega, t, QueueArray[0]);
             in_cpu = wrapper_rr(queues, QueueArray, quantum, in_cpu, t, 0);
-            imprimir_colas(QueueArray, queues); 
+            // imprimir_colas(QueueArray, queues); 
             if (in_cpu == NULL) {
                 printf("Tiempo %d: proceso en CPU es NULL\n\n", t);
             } else {
                 printf("Tiempo %d: proceso en CPU es %s\n\n", t, in_cpu -> name);
             }
-            if (t == s) { 
+            if (t % s == 0 && t > 0) { 
                 subir_prioridades(queues, QueueArray, in_cpu);
-                // printf("count en main en subir_prioridades: %d\n", QueueArray[0] -> count);
-                // queues = 1;
-                // linkedlist_imprimir(QueueArray[0]);
-                // printf("Puntero final es %s\n", QueueArray[0] -> puntero_final -> name);
+                in_cpu -> no_bajar = 1;
             }
             t++;
             T = t;
@@ -136,13 +133,9 @@ int main( int argc, char * argv [] ) {
     } else {                                                /* v3 */
         Process* in_cpu = (Process*) NULL;                  /*algún proceso basura para la primera iteración*/
         int max_start_time = calc_max_start(bodega);
-        printf("Max start time is %d\n", max_start_time);
         int t = 0;
         T = t;
         while (t <= max_start_time || !todas_vacias(queues, QueueArray)) {
-            if (t == 100) {
-                exit(0);
-            }
             // sleep(1);
             revisar_llegadas(bodega, t, QueueArray[0]);
             in_cpu = wrapper_rr(queues, QueueArray, quantum, in_cpu, t, 1);
@@ -152,11 +145,8 @@ int main( int argc, char * argv [] ) {
             } else {
                 printf("Tiempo %d: proceso en CPU es %s\n\n", t, in_cpu -> name);
             }
-            if (t % s == 0) { 
-                // subir_prioridades(queues, QueueArray, in_cpu);
-                // printf("count en main en subir_prioridades: %d\n", QueueArray[0] -> count);
-                // linkedlist_imprimir(QueueArray[0]);
-                // printf("Puntero final es %s\n", QueueArray[0] -> puntero_final -> name);
+            if (t % s == 0 && t > 0) { 
+                subir_prioridades(queues, QueueArray, in_cpu);
             }
             t++;
             T = t;
