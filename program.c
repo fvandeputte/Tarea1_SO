@@ -306,6 +306,7 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
         Process* in_cpu2 = encontrar_siguiente_proceso(in_cpu, queue, QueueArray, quantum, t, queues);
         if (in_cpu != in_cpu2) {
             in_cpu2 -> elegido_cpu++;
+            printf("[1] %s ahora lleva %d turnos\n", in_cpu2 -> name, in_cpu2 -> elegido_cpu);
         }
         strcpy(in_cpu -> estado, "fi");
         linkedlist_remove(queue, in_cpu, 1);
@@ -331,12 +332,14 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
                             Process* sig = in_cpu -> siguiente_q;
                             if (sig == NULL) {
                                 QueueArray[i] -> puntero_inicio -> elegido_cpu++;
+                                printf("[1] %s ahora lleva %d turnos\n", QueueArray[i] -> puntero_inicio -> name, QueueArray[i] -> puntero_inicio -> elegido_cpu);
                                 if (QueueArray[i] -> puntero_inicio -> response_t == -1) {
                                     QueueArray[i] -> puntero_inicio -> response_t = t - QueueArray[i] -> puntero_inicio -> start_time;
                                 }
                                 return QueueArray[i] -> puntero_inicio;
                             } else {
                                 sig -> elegido_cpu++;
+                                printf("[2] %s ahora lleva %d turnos\n", sig -> name, sig -> elegido_cpu);        
                                 if (sig -> response_t == -1) {
                                     sig -> response_t = t - sig -> start_time;
                                 }
@@ -344,6 +347,7 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
                             }
                         }
                         QueueArray[i] -> puntero_inicio -> elegido_cpu++;
+                        printf("[3] %s ahora lleva %d turnos\n", QueueArray[i] -> puntero_inicio -> name, QueueArray[i] -> puntero_inicio -> elegido_cpu);
                         if (QueueArray[i] -> puntero_inicio -> response_t == -1) {
                             QueueArray[i] -> puntero_inicio -> response_t = t - QueueArray[i] -> puntero_inicio -> start_time;
                         }
@@ -354,13 +358,16 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
                 if (mi_queue(in_cpu, QueueArray, queues) -> count > 1) {
                     if (in_cpu == mi_queue(in_cpu, QueueArray, queues) -> puntero_final) {
                         mi_queue(in_cpu, QueueArray, queues) -> puntero_inicio -> elegido_cpu++;
+                        printf("[4] %s ahora lleva %d turnos\n", mi_queue(in_cpu, QueueArray, queues) -> puntero_inicio -> name, mi_queue(in_cpu, QueueArray, queues) -> puntero_inicio -> elegido_cpu);
                         return mi_queue(in_cpu, QueueArray, queues) -> puntero_inicio;
                     } else {
                         in_cpu -> siguiente_q -> elegido_cpu++;
+                        printf("[5] %s ahora lleva %d turnos\n", in_cpu -> name, in_cpu -> elegido_cpu);
                         return in_cpu -> siguiente_q;
                     }
                 }
                 in_cpu -> elegido_cpu++;
+                printf("[6] %s ahora lleva %d turnos\n", in_cpu -> name, in_cpu -> elegido_cpu);
                 return in_cpu;
             }
 
@@ -368,7 +375,7 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
                 in_cpu2 -> response_t = t - in_cpu2 -> start_time;
             }
         
-            
+            printf("[7] %s ahora lleva %d turnos\n", in_cpu2 -> name, in_cpu2 -> elegido_cpu);
             return in_cpu2;
         } else {
             return in_cpu;
@@ -419,11 +426,11 @@ Process* round_robin(LinkedList* queue, int quantum, LinkedList* QueueArray[], P
                 }
             }
         }
-
         if (in_cpu2 -> response_t == -1) { /*Nunca ha entrado: no estoy seguro que sea necesario en este caso*/
             in_cpu2 -> response_t = t - in_cpu2 -> start_time;
         }
         in_cpu2 -> elegido_cpu++;
+        printf("[8] %s ahora lleva %d turnos\n", in_cpu2 -> name, in_cpu2 -> elegido_cpu);
         return in_cpu2;
     }
 
